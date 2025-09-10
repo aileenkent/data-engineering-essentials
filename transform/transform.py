@@ -61,8 +61,25 @@ def duckdb_read_parquet():
             --Save as a parquet
             COPY yellow_tripdata_202501 TO '{local_parquet}' (FORMAT PARQUET);
         """)
-
         print("Saved as local parquet")
+
+        con.execute(f"""
+            --attach to remove rds instance using secret
+            ATTACH '' AS rds (TYPE MYSQL, SECRET rds);
+        """)
+        print("Attached to RDS instance")
+
+        con.execute(f"""
+            --drop table
+            DROP TABLE IF EXISTS yellow_tripdata_202501;
+            
+            --Export table into remote RDS
+            CREATE TABLE rds.yellow_tripdata_202501 AS
+            SELECT * FROM transform.yellow_tripdata_202501 LIMIT 10000;
+        """)
+
+        print("Exported into RDS table")
+
 
     except Exception as e:
         print(f"An error occurred: {e}")
