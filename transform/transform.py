@@ -1,5 +1,5 @@
 import os
-#import duckdb
+import duckdb
 
 input_file = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-01.parquet"
 local_parquet = "yellow_cab_202501.parquet"
