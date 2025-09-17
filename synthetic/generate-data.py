@@ -3,10 +3,14 @@ from sdv.metadata import SingleTableMetadata
 import pandas as pd
 import numpy as np
 
-# Create sample data with some missing values
-print("Creating sample data...")
+"""
+This script generates 3M rows of synthetic data with missing values and duplicates.
+It uses the SDV library to generate the synthetic data based on a Pandas DataFrame,
+    populated with random data provided by numpy.
+It then adds duplicates and missing values to the data.
+It then saves the data to a CSV and a Parquet file.
+"""
 
-# Generate random birthdates between 1930 and 2006
 start_date = pd.Timestamp('1930-01-01')
 end_date = pd.Timestamp('2006-12-31')
 date_range = (end_date - start_date).days
@@ -15,7 +19,6 @@ birth_dates = [start_date + pd.Timedelta(days=days) for days in random_days]
 
 sample_data = pd.DataFrame({
     'id': range(1, 101),  # 100 rows
-    # 'age': np.random.randint(18, 80, 100),
     'income': np.random.normal(50000, 15000, 100),
     'city': np.random.choice(['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'], 100),
     'birth_date': birth_dates,  # Random birthdates in YYYY-MM-DD format
@@ -28,36 +31,32 @@ sample_data.loc[missing_indices, 'score'] = np.nan
 
 print(f"Sample data shape: {sample_data.shape}")
 print(f"Missing values in 'score' column: {sample_data['score'].isna().sum()} ({sample_data['score'].isna().mean():.1%})")
-print("\nFirst 10 rows of sample data:")
-print(sample_data.head(10))
 
 # Create metadata for the single table
-print("\nCreating metadata...")
 metadata = SingleTableMetadata()
 metadata.detect_from_dataframe(sample_data)
 
 # The missing values proportion is automatically detected from the data
 # No need to manually set it - SDV will learn the pattern from the training data
-
-print("Metadata created successfully!")
+print("Metadata created")
 print(f"Column names: {metadata.get_column_names()}")
 
+# ------------------------------------------------------------
+# Now use the metadata to generate the synthetic data
+# ------------------------------------------------------------
+
 # Initialize the GaussianCopulaSynthesizer
-print("\nInitializing synthesizer...")
 synthesizer = GaussianCopulaSynthesizer(metadata)
 
 # Fit the synthesizer to the sample data
-print("Fitting synthesizer to data...")
 synthesizer.fit(sample_data)
 
 # Generate synthetic data
-print("Generating synthetic data...")
 synthetic_data = synthesizer.sample(num_rows=3000000)
 
 print(f"\nSynthetic data shape before adding duplicates: {synthetic_data.shape}")
 
 # Introduce a small number of duplicate rows (about 0.8% of the data)
-print("Adding duplicate rows...")
 num_duplicates = int(0.007924 * len(synthetic_data))
 print(f"Adding {num_duplicates} duplicate rows...")
 
@@ -87,4 +86,4 @@ print(synthetic_data_with_duplicates.describe())
 # Save the synthetic data to CSV
 output_file = 'synthetic_data_with_missing_and_duplicates.csv'
 synthetic_data_with_duplicates.to_csv(output_file, index=False)
-print(f"\nSynthetic data saved to: {output_file}")
+synthetic_data_with_duplicates.to_parquet("synthdata_with_duplicates.parquet", index=False)
