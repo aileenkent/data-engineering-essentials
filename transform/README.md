@@ -139,6 +139,23 @@ LEFT JOIN order_details od ON o.order_id = od.order_id
 GROUP BY c.customer_id, c.company_name;
 ```
 
+## 4a. Creating Calculated Fields - DOB
+
+Imagine a table that provides `birth_date` in some format, such as `YYYY-MM-DD`.
+To introduce a new calculated column that derives an age (in years) it must be 
+calculated in realtime.
+
+DuckDB has two useful built-in functions for this calculation: `date_diff` and
+strong DateTime features to extract `year` from a `datetime` value.
+
+```
+ALTER TABLE your_table_name 
+ADD COLUMN age INTEGER;
+
+UPDATE your_table_name 
+SET age = date_diff('year', birth_date, CURRENT_DATE);
+```
+
 ## 5. Window functions
 Performing calculations across related rows using OVER() clauses.
 

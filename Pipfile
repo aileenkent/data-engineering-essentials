@@ -13,6 +13,8 @@ numpy = "*"
 matplotlib = "*"
 duckdb = "*"
 dbt-duckdb = "*"
+faker = "*"
+sdv = "*"
 
 [dev-packages]
 
