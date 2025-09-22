@@ -11,7 +11,7 @@ Having trouble calling up DuckDB with a simple `duckdb` command? Find the full p
 
 ```
 # alias below
-alias duckdb='/Users/nmagee/.local/bin/duckdb'
+alias duckdb='/Users/MY-ACCOUNT-NAME/.local/bin/duckdb'
 ```
 Then open a new terminal and the simple command is available to you!
 
